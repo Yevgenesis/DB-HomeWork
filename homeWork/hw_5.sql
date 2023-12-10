@@ -1,24 +1,29 @@
-create table videos (
-                        id int,
-                        created_at timestamp,
-                        author_id int,
-                        title varchar(64),
-                        duration_secs int
+create table comments
+(
+    id         int,
+    created_at timestamp,
+    author_id  int,
+    content    text,
+    video_id   int
 );
 
-insert into videos  (id, created_at, author_id, title, duration_secs)
-values (1, now(), 1, 'Super video', 12345),
-       (2, now(), 1, 'Super video2', 54321);
+create table reactions
+(
+    id         int,
+    created_at timestamp,
+    author_id  int,
+    value    int,
+    video_id   int
 
-update videos set title = 'New title'
-WHERE id = 2;
+);
 
-delete from videos where id=2;
+insert into comments (id,created_at,author_id,content,video_id)
+values
+    (1,now(),2,'coll video', 34),
+    (2,now(),2,'Like!', 7);
 
-select u.user_name, v.title
-from users u
-join videos v on u.id = v.author_id;
-
-
-
+insert into reactions(id,created_at,author_id,value,video_id)
+values
+    (1,now(),2,1,34),
+    (1,now(),2,0,3);
 
