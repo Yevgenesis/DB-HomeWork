@@ -1,5 +1,5 @@
 -- Вывести ко-во товаров с ценой от 10 до 250 EUR
-SELECT COUNT(*)  AS Quantity
+SELECT COUNT(*) AS Quantity
 FROM products
 WHERE Price BETWEEN 10 AND 250;
 
