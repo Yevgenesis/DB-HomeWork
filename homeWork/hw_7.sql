@@ -31,6 +31,7 @@ JOIN orders o ON e.EmployeeID = o.EmployeeID
 GROUP BY o.EmployeeID
 HAVING OrdersQuantity < 15;
 
+
 -- Вывести ТОП-1 стран по ко-ву клиентов
 SELECT Country
 FROM customers
