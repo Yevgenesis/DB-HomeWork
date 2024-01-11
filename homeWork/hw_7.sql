@@ -2,7 +2,8 @@
 SELECT c.CategoryName, MIN(Price) MinProductPrice
 FROM products p
 JOIN categories c ON p.CategoryID = c.CategoryID
-GROUP BY p.CategoryID;
+GROUP BY p.CategoryID
+ORDER BY MinProductPrice;
 
 
 -- Вывести названия категорий, в которых более 10 товаров
