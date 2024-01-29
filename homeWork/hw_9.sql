@@ -46,7 +46,7 @@ WHERE employees.salary = emploue_salary.max_salary;
 
 
 -- Найти департаменты, в которых больше 10 сотрудников. Вывести department_name
-SELECT departments.department_name, department.cnt AS emploues_count
+SELECT departments.department_name
 from departments
          join (SELECT employees.department_id, COUNT(*) cnt
                from employees
