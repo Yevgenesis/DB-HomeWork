@@ -1,151 +1,105 @@
-// 1. Создать коллекцию workers.
-// 2. Заполнить коллекцию workers 5 документами со свойствами _id, firstname, lastname, age, position, salary, skills. Используйте следующие данные:
-
-// 1. Inga Petrova, 27, Barista, 1500, [’preparing drinks’, ‘cleaning equipment’]
-// 2. Boris Orlov, 36, Server, 2400, [’taking orders’, ‘suggesting meals’, ‘taking payments’]
-// 3. Ivan Demidov, 32, Chef, 3200, [’preparing food’, ‘baking bread’]
-// 4. Marina Sidorova, 22, Hostess, 1700, [’greeting guests’, ‘seating guests’, ‘answering phone calls’]
-// 5. Olga Ivanova, 43, Sommelier, 2500, [’curating a wine list’, ‘creating wine pairings’]
-
-use gr220823
-
-db.workers2.insertMany([{
-    _id: 1,
-    firstname: "Inga",
-    lastname: "Petrova",
-    age: 27,
-    position: "Barista",
-    salary: 1500,
-    skills: ["preparing drinks", "cleaning equipment"]
-}, {
-    _id: 2,
-    firstname: "Boris",
-    lastname: "Orlov",
-    age: 36,
-    position: "Server",
-    salary: 2400,
-    skills: ["taking orders", "suggesting meals", "taking payments"]
-}, {
-    _id: 3,
-    firstname: "Ivan",
-    lastname: "Demidov",
-    age: 32,
-    position: "Chef",
-    salary: 3200,
-    skills: ["preparing food", "baking bread"]
-}, {
-    _id: 4,
-    firstname: "Marina",
-    lastname: "Sidorova",
-    age: 22,
-    position: "Hostess",
-    salary: 1700,
-    skills: ["greeting guests", "seating guests", "answering phone calls"]
-}, {
-    _id: 5,
-    firstname: "Olga",
-    lastname: "Ivanova",
-    age: 43,
-    position: "Sommelier",
-    salary: 2500,
-    skills: ["curating a wine list", "creating wine pairings"]
-}])
-
-
-// Найти всех работников, чья зарплата больше 2000.
-
-db.workers.find({salary: {$gte: 2000}})
-db.workers.find({age: {$lt: 30}})
-db.workers.find({position: {$in: ["Server", "Chef"]}})
-db.workers.find({skills: "taking orders"})
-db.workers.find({$not: [{skills: "taking orders"}]})
-db.workers.find({skills: {$nin: ["baking bread"]}})
-
-// Найти всех работников, чья зарплата больше 2000 и чьи навыки включают "greeting guests".
-
-db.workers.find({salary: {$gt: 2000}, skills: "greeting guests"})
-
-// Найти всех работников, чья зарплата меньше 3000 или возраст больше 40.
-
-db.workers.find({
-    $or: [
-        {salary: {$lt: 3000}},
-        {age: {$gt: 40}}
-    ]
-})
-
-//  Найти всех работников, чья зарплата меньше 3000 или возраст больше 40. Вывести только имя и фамилию
-db.workers.find(
-    {$or: [{salary: {$lt: 3000}}, {age: {$gt: 40}}]},
-    {firstname: 1, lastname: 1, _id: 0}
-    )
-
-//Найти всех работников, чья зарплата меньше 3000 или возраст больше 40. Вывести все поля, кроме зарплаты
-db.workers.find(
-    {$or: [{salary: {$lt: 3000}}, {age: {$gt: 40}}]},
-    {salary: 0}
-    )
-
-
-//Вывести первого сотрудника
-db.workers.find().limit(1)
-
-// Вывести всех пропуская первых двух сотрудников
-db.workers.find().skip(2)
-
-//Вывести двух сотрудников пропуская первого сотрудника
-db.workers.find().skip(1).limit(2)
-
-// Сортировка
-db.workers.find().sort({поле: 1}) // (по возрс.)
-db.workers.find().sort({поле: -1}) // (по убыв.)
-
-db.workers.find().skip(2).limit(3)
-
-// Пагинация массива
-// slice = skip + limit для массива
-
-$slice: limit
-$slice: [skip, limit]
-
-// Вывести только первый навык сотрудника Марина
-db.workers.find({firstname: 'Marina'}, {skills: {$slice: 1}})
-
-db.workers.find({firstname: 'Marina'}, {skills: {$slice: [1,]}})
-db.workers.find({firstname: 'Marina'}, {skills: {$slice: -1}})
-
-db.workers.find({firstname: 'Marina'}, {skills: {$slice: [1,]}})
-
-
-db.workers.aggregate([
-    {$match: {firstname: 'Marina'}}, // Находим все документы с именем Marina
-    {
-        $project: {
-            _id: 1,
-            firstname: 1,
-            lastname: 1,
-            age: 1,
-            position: 1,
-            salary: 1,
-            skills: {$slice: ['$skills', 1, {$size: '$skills'}]}
-        }
-    } // Исключаем первый элемент из массива skills
+// Есть коллекция employees:
+db.employees.insertMany([
+    {"name": "Alice", "age": 28, "position": "Manager", "salary": 5000},
+    {"name": "Bob", "age": 35, "position": "Developer", "salary": 6000},
+    {"name": "Charlie", "age": 24, "position": "Designer", "salary": 4000},
+    {"name": "David", "age": 31, "position": "Analyst", "salary": 5500},
+    {"name": "Eva", "age": 29, "position": "HR", "salary": 4500}
 ])
 
 
-db.workers.find({firstname: 'Boris'}, {skills: 1})
+// Найти первых двух сотрудников в списке.
+db.employees.find().limit(2)
 
-db.workers2.find({firstname: 'Boris'},
+
+//     Найти сотрудников в возрасте до 30 лет и отсортировать их по возрасту в порядке возрастания.
+db.employees.find({age: {$lt: 30}}).sort({age: 1})
+
+
+//     Найти сотрудников, пропустив первых двух и ограничив выборку следующими тремя.
+db.employees.find().skip(2).limit(3)
+
+
+//     Найти сотрудников, занимающих позицию "Developer" и отсортировать их по возрасту в порядке убывания.
+db.employees.find({position: "Developer"}).sort({age: -1})
+
+
+//     Найти сотрудников, занимающих позицию "Manager" и "HR", и отобразить только их имена, ограничив выборку первыми двумя.
+db.employees.find({position: {$in: ["HR", "Manager"]}}, {_id: 0, name: 1}).limit(2)
+
+
+//     Найти сотрудников с зарплатой от 4500 до 5500 и отсортировать их по возрасту в порядке возрастания.
+db.employees.find({salary: {$gte: 4500, $lte: 5500}}).sort({age: 1})
+
+
+//     Найти сотрудников с зарплатой выше 5000, пропустив первого, и отобразить только их имена.
+db.employees.find({salary: {$gte: 5000}}, {_id: 0, name: 1}).skip(1)
+
+
+//     Найти сотрудников, отсортированных по возрасту в порядке убывания, и вернуть только первого.
+db.employees.find().sort({age: -1}).limit(1)
+
+//     Найти сотрудников в возрасте от 25 до 35 лет и ограничить список первыми тремя.
+db.employees.find({age: {$gte: 25, $lte: 35}}).limit(3)
+
+
+//     Найти сотрудников с позициями "Manager" или "Developer" и вернуть только их имена и позиции, отсортированных по позиции в алфавитном порядке.
+db.employees.find({position: {$in: ["Manager", "Developer"]}}, {_id: 0, name: 1, position: 1}).sort({position: 1})
+
+
+//     Найти сотрудников с зарплатой выше 4000, пропустив первых двух, и отобразить только их имена и зарплаты.
+db.employees.find({salary: {$gt: 4000}}, {_id: 0, name: 1, salary: 1}).skip(2)
+
+
+//     Найти сотрудников с зарплатой меньше 5500 и отобразить только их имена, отсортированные по имени в алфавитном порядке.
+db.employees.find({salary: {$lt: 5500}}, {_id: 0, name: 1}).sort({name: 1})
+
+
+//     Найти сотрудников с позицией "Analyst" и вернуть только их имена и позиции, отсортированных по возрасту в порядке убывания, пропустив первого.
+db.employees.find({position: {$in: ["Analyst"]}}, {_id: 0, name: 1, position: 1}).sort({age: -1}).skip(1)
+
+
+// 2 уровень сложности: Есть коллекция departments:
+db.departments.insertMany([
     {
-        _id: 0,
-        firstname: 0,
-        lastname: 0,
-        position: 0,
-        salary:0,
-        age:0,
-        skills: {$slice: 1}
-    })
+        "name": "HR",
+        "employees": [
+            {"name": "Alice", "position": "Manager"},
+            {"name": "Bob", "position": "HR Specialist"},
+            {"name": "Charlie", "position": "Recruiter"},
+            {"name": "David", "position": "Assistant"},
+            {"name": "Eva", "position": "Intern"}
+        ]
+    },
+    {
+        "name": "IT",
+        "employees": [
+            {"name": "Frank", "position": "CTO"},
+            {"name": "Grace", "position": "Developer"},
+            {"name": "Henry", "position": "SysAdmin"},
+            {"name": "Ivy", "position": "QA Engineer"},
+            {"name": "Jack", "position": "Support Specialist"}
+        ]
+    }
+])
 
-db.workers.find({ firstname: 'Boris' }, {
-    skills: { $slice: 1 }
-})
+
+// ---------------- МЫ ЭТО НЕ УЧИЛИ, ПРИШЛОСЬ ГУГЛИТЬ ----------------
+
+// Получить первых двух сотрудников из департамента HR.
+db.departments.findOne({name: "HR"}, {employees: {$slice: 2}}).employees
+
+
+//     Получить последних трех сотрудников из департамента IT.
+db.departments.findOne({name: "IT"}, {employees: {$slice: -3}}).employees
+
+
+//     Получить третьего и четвертого сотрудников из департамента HR.
+db.departments.findOne({name: "HR"},
+    {employees: {$slice: ["$employees", 2, 2]}}).employees
+
+
+//     Получить первого сотрудника из департамента IT и отобразить только его имя.
+db.departments.findOne({name: "IT"}, {employees: {$slice: ["$employees.name", 0, 1]}}).employees
+
+
