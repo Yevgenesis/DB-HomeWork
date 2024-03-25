@@ -5,6 +5,7 @@ FROM order_details
 ORDER BY products.Price DESC
 LIMIT 1;
 
+
 -- Вывести два самых дорогих товара из категории Beverages из USA
 SELECT products.*
 FROM products
